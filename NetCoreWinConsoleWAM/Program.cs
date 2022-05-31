@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace NetCoreWinConsoleWAM
 {
-    class Program
+    public class WAMApp
     {
         [DllImport("kernel32.dll")]
         static extern IntPtr GetConsoleWindow();
@@ -15,9 +15,11 @@ namespace NetCoreWinConsoleWAM
         public const string MicrosoftCommonAuthority = "https://login.microsoftonline.com/common";
         public const string Scopes = "profile";
         public const string RedirectUri = "about:blank";
-        static void Main(string[] args)
+
+        public static void Main(string[] args)
         {
-            Task wamValidate = WAMValidate();
+            IntPtr hWnd = GetConsoleWindow();
+            Task wamValidate = WAMValidate(hWnd);
             wamValidate.Wait();
             wamValidate.Dispose();
             wamValidate = null;
@@ -31,7 +33,7 @@ namespace NetCoreWinConsoleWAM
                 Console.WriteLine(ex.ToString());
             }
 
-            Console.ReadLine();
+            //Console.ReadLine();
 
         }
 
@@ -39,36 +41,37 @@ namespace NetCoreWinConsoleWAM
         /// Validate Interop WAM
         /// </summary>
         /// <returns></returns>
-        private static async Task WAMValidate()
+        public static async Task<AuthResult> WAMValidate(IntPtr hWnd)
         {
             try
             {
                 using (var core = new Core())
                 using (var authParams = new AuthParameters(VSApplicationId, MicrosoftCommonAuthority))
                 {
-                    IntPtr hWnd = GetConsoleWindow();
                     authParams.RequestedScopes = Scopes;
                     authParams.RedirectUri = RedirectUri;
                     
-                    using (AuthResult authResult = await core.SignInInteractivelyAsync(hWnd, authParams, CorrelationId))
+                    using (AuthResult authResult = await core.SignInAsync(hWnd, authParams, CorrelationId))
                     {
-                        GetRuntimeAuthResult(authResult);
+                        //GetRuntimeAuthResult(authResult);
 
-                        if (authResult.IsSuccess)
-                        {
-                            await ReadAccountAsync(core, CorrelationId, authResult.Account.Id);
-                            await AcquireTokenSilentlyAsync(core, CorrelationId, authResult.Account, authParams);
-                        }
+                        //if (authResult.IsSuccess)
+                        //{
+                        //    await ReadAccountAsync(core, CorrelationId, authResult.Account.Id);
+                        //    await AcquireTokenSilentlyAsync(core, CorrelationId, authResult.Account, authParams);
+                        //}
+                        return authResult;
                     }
                 }
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.ToString());
+                throw new Exception(ex.Message);
             }
         }
 
-        private static void GetRuntimeAuthResult(AuthResult authResult)
+        public static string GetRuntimeAuthResult(AuthResult authResult)
         {
             if (authResult.IsSuccess)
             {
@@ -78,6 +81,8 @@ namespace NetCoreWinConsoleWAM
                 Console.WriteLine($"Access Token: {authResult.AccessToken}");
                 Console.WriteLine($"Expires On: {authResult.ExpiresOn}");
                 Console.WriteLine($"Raw Id Token: {authResult.RawIdToken}");
+
+                return $"Account Id: {authResult.IdToken}";
             }
             else
             {
@@ -86,7 +91,7 @@ namespace NetCoreWinConsoleWAM
             }
         }
 
-        private static async Task ReadAccountAsync(Core core, string correlationId, string accountId)
+        public static async Task ReadAccountAsync(Core core, string correlationId, string accountId)
         {
             Console.WriteLine();
             Console.WriteLine("Verifying ReadAccountById api.");
@@ -104,7 +109,7 @@ namespace NetCoreWinConsoleWAM
             }
         }
 
-        private static async Task AcquireTokenSilentlyAsync(Core core, string correlationId, Account account, AuthParameters authParams)
+        public static async Task AcquireTokenSilentlyAsync(Core core, string correlationId, Account account, AuthParameters authParams)
         {
             Console.WriteLine();
             Console.WriteLine("Checking AcquireTokenSilently api.");
