@@ -146,7 +146,8 @@ namespace NetCoreWinConsoleWAM
                     }
                     else
                     {
-                        return null;
+                        Console.WriteLine($"Error: {result.Error}");
+                        throw new MsalRuntimeException(result.Error);
                     }
                 }
             }
@@ -169,7 +170,8 @@ namespace NetCoreWinConsoleWAM
                     }
                     else
                     {
-                        return null;
+                        Console.WriteLine($"Error: {result.Error}");
+                        throw new MsalRuntimeException(result.Error);
                     }
                 }
             }
