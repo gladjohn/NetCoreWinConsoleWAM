@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.32106.194
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetCoreWinConsoleWAM", "NetCoreWinConsoleWAM\NetCoreWinConsoleWAM.csproj", "{9DE4AE13-4ABA-4A79-ACD5-2ED8C68B037B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetCoreWinConsoleWAM", "NetCoreWinConsoleWAM\NetCoreWinConsoleWAM.csproj", "{9DE4AE13-4ABA-4A79-ACD5-2ED8C68B037B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestProject1", "TestProject1\TestProject1.csproj", "{138080A1-097C-41F6-94C0-E35B8F18E50B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WAMTest", "WAMTest\WAMTest.csproj", "{237FABCD-CB67-47D0-8563-8FE8BBD0FBEA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,10 +17,10 @@ Global
 		{9DE4AE13-4ABA-4A79-ACD5-2ED8C68B037B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9DE4AE13-4ABA-4A79-ACD5-2ED8C68B037B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9DE4AE13-4ABA-4A79-ACD5-2ED8C68B037B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{138080A1-097C-41F6-94C0-E35B8F18E50B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{138080A1-097C-41F6-94C0-E35B8F18E50B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{138080A1-097C-41F6-94C0-E35B8F18E50B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{138080A1-097C-41F6-94C0-E35B8F18E50B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{237FABCD-CB67-47D0-8563-8FE8BBD0FBEA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{237FABCD-CB67-47D0-8563-8FE8BBD0FBEA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{237FABCD-CB67-47D0-8563-8FE8BBD0FBEA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{237FABCD-CB67-47D0-8563-8FE8BBD0FBEA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
