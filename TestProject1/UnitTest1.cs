@@ -17,11 +17,15 @@ namespace TestProject1
         [TestMethod]
         public async Task TestMethod1()
         {
-            IntPtr intPtr = GetConsoleWindow();
-            AuthResult authResult = await WAMApp.WAMValidate(intPtr);
 
-            var result = WAMApp.GetRuntimeAuthResult(authResult);
-            
+            AuthResult authResult = await WAMApp.WAMValidate();
+
+            AuthResult result = await WAMApp.ValidateAcquireTokenSilentlyAsync(authResult.Account);
+
+            Assert.AreEqual(authResult.Account, result.Account);
+
         }
+
+
     }
 }

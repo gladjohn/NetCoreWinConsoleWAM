@@ -1,121 +1,177 @@
 ﻿using Microsoft.Identity.Client.NativeInterop;
 using System;
 using System.Runtime.InteropServices;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace NetCoreWinConsoleWAM
 {
+
     public class WAMApp
     {
         [DllImport("kernel32.dll")]
         static extern IntPtr GetConsoleWindow();
 
-        public static string CorrelationId = "b0435a5c-6d97-41d6-9372-812e7fac3c10";
-        public static string VSApplicationId = "26a7ee05-5602-4d76-a7ba-eae8b7b67941";
-        public const string MicrosoftCommonAuthority = "https://login.microsoftonline.com/common";
-        public const string Scopes = "profile";
-        public const string RedirectUri = "about:blank";
+        private const string CorrelationId = "fc8fc0e8-c631-4be3-8857-f21f4ea669f3";
 
-        public static void Main(string[] args)
+        static async Task Main(string[] args)
         {
-            IntPtr hWnd = GetConsoleWindow();
-            Task wamValidate = WAMValidate(hWnd);
-            wamValidate.Wait();
-            wamValidate.Dispose();
-            wamValidate = null;
+            AuthResult wamValidate = await WAMValidate().ConfigureAwait(false);
+            await ValidateAcquireTokenSilentlyAsync(wamValidate.Account);
+            await ValidateAcquireTokenInteractivelyAsync(wamValidate.Account);
+            await ValidateReadAccountByIdAsync(wamValidate.Account.Id);
 
-            try
-            {
-                Core.VerifyHandleLeaksForTest();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.ToString());
-            }
-
-            //Console.ReadLine();
+            Console.ReadLine();
 
         }
 
-        /// <summary>
-        /// Validate Interop WAM
-        /// </summary>
-        /// <returns></returns>
-        public static async Task<AuthResult> WAMValidate(IntPtr hWnd)
+        public static async Task<AuthResult> WAMValidate()
         {
+            Console.WriteLine("---------------------------------------------------------------");
+            Console.WriteLine("SignInAsync api.");
+
             try
             {
                 using (var core = new Core())
-                using (var authParams = new AuthParameters(VSApplicationId, MicrosoftCommonAuthority))
+                using (var authParams = GetCommonAuthParameters(false))
                 {
-                    authParams.RequestedScopes = Scopes;
-                    authParams.RedirectUri = RedirectUri;
+                    IntPtr hWnd = GetConsoleWindow();
                     
-                    using (AuthResult authResult = await core.SignInAsync(hWnd, authParams, CorrelationId))
+                    using (AuthResult result = await core.SignInAsync(hWnd, authParams, CorrelationId, default))
                     {
-                        //GetRuntimeAuthResult(authResult);
+                        PrintResults(result);
 
-                        //if (authResult.IsSuccess)
-                        //{
-                        //    await ReadAccountAsync(core, CorrelationId, authResult.Account.Id);
-                        //    await AcquireTokenSilentlyAsync(core, CorrelationId, authResult.Account, authParams);
-                        //}
-                        return authResult;
+                        if (result.IsSuccess)
+                        {
+                            return result;
+                        }
+                        else 
+                        {
+                            return null;
+                        }
                     }
                 }
             }
-            catch (Exception ex)
+            catch (MsalRuntimeException ex)
             {
-                Console.WriteLine(ex.ToString());
-                throw new Exception(ex.Message);
+                return null;
             }
         }
 
-        public static string GetRuntimeAuthResult(AuthResult authResult)
+        public static AuthParameters GetCommonAuthParameters(
+            bool isMsaPassthrough)
         {
-            if (authResult.IsSuccess)
-            {
-                Console.WriteLine($"Account Id: {authResult.IdToken}");
-                Console.WriteLine($"Account Id: {authResult.Account.Id}");
-                Console.WriteLine($"Account Client Info: {authResult.Account.ClientInfo}");
-                Console.WriteLine($"Access Token: {authResult.AccessToken}");
-                Console.WriteLine($"Expires On: {authResult.ExpiresOn}");
-                Console.WriteLine($"Raw Id Token: {authResult.RawIdToken}");
+            const string clientId = "04f0c124-f2bc-4f59-8241-bf6df9866bbd";
+            const string authority = "https://login.microsoftonline.com/organizations";
+            const string scopes = "https://management.core.windows.net//.default";
+            const string redirectUri = "http://localhost";
 
-                return $"Account Id: {authResult.IdToken}";
+            //MSA-PT Auth Params
+            const string nativeInteropMsalRequestType = "msal_request_type";
+            const string consumersPassthroughRequest = "consumer_passthrough";
+
+        var authParams = new AuthParameters(clientId, authority);
+
+            //scopes
+            authParams.RequestedScopes = scopes;
+
+            //WAM redirect URi does not need to be configured by the user
+            //this is used internally by the interop to fallback to the browser 
+            authParams.RedirectUri = redirectUri;
+
+            //MSA-PT
+            if (isMsaPassthrough)
+                authParams.Properties[nativeInteropMsalRequestType] = consumersPassthroughRequest;
+
+
+            return authParams;
+        }
+        private static void PrintResults(AuthResult result)
+        {
+            if (result.IsSuccess)
+            {
+                Console.WriteLine("---------------------------------------------------------------");
+                Console.WriteLine($"Account ID : {result.Account.Id}");
+                Console.WriteLine($"Client Info : {result.Account.ClientInfo}");
+                Console.WriteLine($"Access Token : {result.AccessToken}");
+                Console.WriteLine($"Expires On : {result.ExpiresOn}");
+                Console.WriteLine($"ID Token : {result.RawIdToken}");
+                Console.WriteLine("---------------------------------------------------------------");
             }
             else
             {
-                Console.WriteLine($"Error: {authResult.Error}");
-                throw new MsalRuntimeException(authResult.Error);
+                Console.WriteLine($"Error: {result.Error}");
+                throw new MsalRuntimeException(result.Error);
             }
         }
 
-        public static async Task ReadAccountAsync(Core core, string correlationId, string accountId)
+        private static async Task ValidateReadAccountByIdAsync(string accountId)
         {
-            Console.WriteLine();
-            Console.WriteLine("Verifying ReadAccountById api.");
-            using (Account result = await core.ReadAccountByIdAsync(accountId, correlationId))
+            Console.WriteLine("ReadAccountByIdAsync api.");
+            Console.WriteLine("---------------------------------------------------------------");
+
+            using (var core = new Core())
+            using (var authParams = GetCommonAuthParameters(false))
             {
-                if (result == null)
+                using (Account acc = await core.ReadAccountByIdAsync(accountId, CorrelationId))
                 {
-                    Console.WriteLine($"Account id: {accountId} is not found");
-                }
-                else
-                {
-                    Console.WriteLine($"Account Id: {result.Id}");
-                    Console.WriteLine($"Account Client Info: {result.ClientInfo}");
+                    if (acc == null)
+                    {
+                        Console.WriteLine($"Account (id: {accountId}) is not found");
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Account Id: {acc.Id}");
+                        Console.WriteLine($"Account Client Info: {acc.ClientInfo}");
+                    }
                 }
             }
         }
 
-        public static async Task AcquireTokenSilentlyAsync(Core core, string correlationId, Account account, AuthParameters authParams)
+
+        public static async Task<AuthResult> ValidateAcquireTokenInteractivelyAsync(Account account)
         {
-            Console.WriteLine();
-            Console.WriteLine("Checking AcquireTokenSilently api.");
-            using (AuthResult authResult = await core.AcquireTokenSilentlyAsync(authParams, correlationId, account))
+            Console.WriteLine("AcquireTokenInteractivelyAsync api.");
+
+            using (var core = new Core())
+            using (var authParams = GetCommonAuthParameters(false))
             {
-                GetRuntimeAuthResult(authResult);
+                using (AuthResult result = await core.AcquireTokenInteractivelyAsync(GetConsoleWindow(), authParams, CorrelationId, account))
+                {
+                    PrintResults(result);
+
+                    if (result.IsSuccess)
+                    {
+                        return result;
+                    }
+                    else
+                    {
+                        return null;
+                    }
+                }
+            }
+        }
+
+        public static async Task<AuthResult> ValidateAcquireTokenSilentlyAsync(Account account)
+        {
+            Console.WriteLine("AcquireTokenSilentlyAsync api.");
+
+            using (var core = new Core())
+            using (var authParams = GetCommonAuthParameters(false))
+            {
+                using (AuthResult result = await core.AcquireTokenSilentlyAsync(authParams, CorrelationId, account))
+                {
+                    PrintResults(result);
+
+                    if (result.IsSuccess)
+                    {
+                        return result;
+                    }
+                    else
+                    {
+                        return null;
+                    }
+                }
             }
         }
     }
