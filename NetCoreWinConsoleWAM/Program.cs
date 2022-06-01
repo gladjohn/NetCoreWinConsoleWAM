@@ -70,7 +70,7 @@ namespace NetCoreWinConsoleWAM
             const string nativeInteropMsalRequestType = "msal_request_type";
             const string consumersPassthroughRequest = "consumer_passthrough";
 
-        var authParams = new AuthParameters(clientId, authority);
+            var authParams = new AuthParameters(clientId, authority);
 
             //scopes
             authParams.RequestedScopes = scopes;
