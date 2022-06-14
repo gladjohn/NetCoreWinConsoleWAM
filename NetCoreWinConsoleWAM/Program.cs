@@ -17,9 +17,10 @@ namespace NetCoreWinConsoleWAM
         static async Task Main(string[] args)
         {
             AuthResult wamValidate = await WAMValidate().ConfigureAwait(false);
-            await ValidateAcquireTokenSilentlyAsync(wamValidate.Account);
+            await ValidateAcquireTokenSilentlyWithUserNamePasswordAsync(wamValidate.Account);
+            //await ValidateAcquireTokenSilentlyAsync(wamValidate.Account);
             await ValidateAcquireTokenInteractivelyAsync(wamValidate.Account);
-            await ValidateReadAccountByIdAsync(wamValidate.Account.Id);
+            //await ValidateReadAccountByIdAsync(wamValidate.Account.Id);
 
             Console.ReadLine();
 
@@ -83,6 +84,9 @@ namespace NetCoreWinConsoleWAM
             if (isMsaPassthrough)
                 authParams.Properties[nativeInteropMsalRequestType] = consumersPassthroughRequest;
 
+            //uncomment to test username password flow
+            authParams.Properties["MSALRuntime_Username"] = "email";
+            authParams.Properties["MSALRuntime_Password"] = "MyPassword@123";
 
             return authParams;
         }
@@ -154,6 +158,30 @@ namespace NetCoreWinConsoleWAM
         }
 
         public static async Task<AuthResult> ValidateAcquireTokenSilentlyAsync(Account account)
+        {
+            Console.WriteLine("AcquireTokenSilentlyAsync api.");
+
+            using (var core = new Core())
+            using (var authParams = GetCommonAuthParameters(false))
+            {
+                using (AuthResult result = await core.AcquireTokenSilentlyAsync(authParams, CorrelationId, account))
+                {
+                    PrintResults(result);
+
+                    if (result.IsSuccess)
+                    {
+                        return result;
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Error: {result.Error}");
+                        throw new MsalRuntimeException(result.Error);
+                    }
+                }
+            }
+        }
+
+        public static async Task<AuthResult> ValidateAcquireTokenSilentlyWithUserNamePasswordAsync(Account account)
         {
             Console.WriteLine("AcquireTokenSilentlyAsync api.");
 
