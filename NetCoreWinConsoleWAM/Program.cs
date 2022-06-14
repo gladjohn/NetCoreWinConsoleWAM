@@ -11,6 +11,8 @@ namespace NetCoreWinConsoleWAM
     {
         [DllImport("kernel32.dll")]
         static extern IntPtr GetConsoleWindow();
+        [DllImport("user32.dll")]
+        private static extern IntPtr GetForegroundWindow();
 
         private const string CorrelationId = "fc8fc0e8-c631-4be3-8857-f21f4ea669f3";
 
@@ -36,7 +38,7 @@ namespace NetCoreWinConsoleWAM
                 using (var core = new Core())
                 using (var authParams = GetCommonAuthParameters(false))
                 {
-                    IntPtr hWnd = GetConsoleWindow();
+                    IntPtr hWnd = GetForegroundWindow();
                     
                     using (AuthResult result = await core.SignInAsync(hWnd, authParams, CorrelationId, default))
                     {

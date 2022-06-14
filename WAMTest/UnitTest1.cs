@@ -17,19 +17,9 @@ namespace WAMTest
 
             AuthResult result = await WAMApp.ValidateAcquireTokenSilentlyAsync(authResult.Account);
 
-            Assert.AreEqual(authResult.Account, result.Account);
+            Assert.IsNotNull( result.Account);
         }
 
-        [TestMethod]
-        public async Task ValidateAcquireTokenInteractivelyAsync()
-        {
-            AuthResult authResult = await WAMApp.WAMValidate();
-
-            Assert.IsNotNull(authResult.Account.Id);
-
-            AuthResult result = await WAMApp.ValidateAcquireTokenInteractivelyAsync(authResult.Account);
-
-            Assert.AreEqual(authResult.Account, result.Account);
-        }
+        
     }
 }
