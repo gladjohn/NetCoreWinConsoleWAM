@@ -57,6 +57,7 @@ namespace NetCoreWinConsoleWAM
             }
             catch (MsalRuntimeException ex)
             {
+                Console.WriteLine(ex.Message);
                 return null;
             }
         }
