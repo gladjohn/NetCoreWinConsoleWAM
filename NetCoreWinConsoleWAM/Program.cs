@@ -18,11 +18,11 @@ namespace NetCoreWinConsoleWAM
 
         static async Task Main(string[] args)
         {
-            AuthResult wamValidate = await WAMValidate().ConfigureAwait(false);
+            //AuthResult wamValidate = await WAMValidate().ConfigureAwait(false);
             await ValidateSignInSilentlyAsync().ConfigureAwait(false);
-            await ValidateAcquireTokenSilentlyAsync(wamValidate.Account).ConfigureAwait(false);
-            await ValidateAcquireTokenInteractivelyAsync(wamValidate.Account).ConfigureAwait(false);
-            await ValidateReadAccountByIdAsync(wamValidate.Account.Id).ConfigureAwait(false);
+            //await ValidateAcquireTokenSilentlyAsync(wamValidate.Account).ConfigureAwait(false);
+            //await ValidateAcquireTokenInteractivelyAsync(wamValidate.Account).ConfigureAwait(false);
+            //await ValidateReadAccountByIdAsync(wamValidate.Account.Id).ConfigureAwait(false);
 
             Console.ReadLine();
 
@@ -90,7 +90,7 @@ namespace NetCoreWinConsoleWAM
             //if (isInit)
             //{
             authParams.Properties["MSALRuntime_Username"] = "idlab@msidlab4.onmicrosoft.com";
-            authParams.Properties["MSALRuntime_Password"] = "Caqi*126";
+            authParams.Properties["MSALRuntime_Password"] = "";
             //}
 
             return authParams;
