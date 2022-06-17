@@ -17,13 +17,12 @@ namespace WAMTest
             Assert.IsNotNull(AuthResult.Account.Id);
         }
 
-        //[TestMethod]
-        //public async Task ValidateAcquireTokenSilentlyWithUserNamePasswordAsync()
-        //{
-        //    AuthResult result = await WAMApp.ValidateSignInSilentlyAsync();
-
-        //    Assert.IsNotNull(result.Account);
-        //}
+        [TestMethod]
+        public async Task ValidateAcquireTokenSilentlyWithUserNamePasswordAsync()
+        {
+            AuthResult = await WAMApp.WAMValidate();
+            Assert.IsNotNull(AuthResult.Account.Id);
+        }
 
         //[TestMethod]
         //public async Task ValidateAcquireTokenInteractivelyAsync()
