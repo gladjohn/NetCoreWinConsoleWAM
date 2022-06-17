@@ -25,21 +25,21 @@ namespace WAMTest
             Assert.IsNotNull(result.Account);
         }
 
-        [TestMethod]
-        public async Task ValidateAcquireTokenInteractivelyAsync()
-        {
-            AuthResult result = await WAMApp.ValidateAcquireTokenInteractivelyAsync(AuthResult.Account).ConfigureAwait(false);
+        //[TestMethod]
+        //public async Task ValidateAcquireTokenInteractivelyAsync()
+        //{
+        //    AuthResult result = await WAMApp.ValidateAcquireTokenInteractivelyAsync(AuthResult.Account).ConfigureAwait(false);
 
-            Assert.IsNotNull(result.Account);
-        }
+        //    Assert.IsNotNull(result.Account);
+        //}
 
-        [TestMethod]
-        public async Task ValidateAcquireTokenSilentlyAsync()
-        {
-            AuthResult result = await WAMApp.ValidateAcquireTokenSilentlyAsync(AuthResult.Account);
+        //[TestMethod]
+        //public async Task ValidateAcquireTokenSilentlyAsync()
+        //{
+        //    AuthResult result = await WAMApp.ValidateAcquireTokenSilentlyAsync(AuthResult.Account);
 
-            Assert.IsNotNull(result.Account);
-        }
+        //    Assert.IsNotNull(result.Account);
+        //}
 
     }
 }
