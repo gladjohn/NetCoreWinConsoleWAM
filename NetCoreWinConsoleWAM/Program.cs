@@ -19,10 +19,10 @@ namespace NetCoreWinConsoleWAM
         static async Task Main(string[] args)
         {
             AuthResult wamValidate = await WAMValidate().ConfigureAwait(false);
-            await ValidateAcquireTokenSilentlyWithUserNamePasswordAsync(wamValidate.Account);
-            //await ValidateAcquireTokenSilentlyAsync(wamValidate.Account);
-            await ValidateAcquireTokenInteractivelyAsync(wamValidate.Account);
-            //await ValidateReadAccountByIdAsync(wamValidate.Account.Id);
+            await ValidateSignInSilentlyAsync().ConfigureAwait(false);
+            await ValidateAcquireTokenSilentlyAsync(wamValidate.Account).ConfigureAwait(false);
+            await ValidateAcquireTokenInteractivelyAsync(wamValidate.Account).ConfigureAwait(false);
+            await ValidateReadAccountByIdAsync(wamValidate.Account.Id).ConfigureAwait(false);
 
             Console.ReadLine();
 
@@ -36,7 +36,7 @@ namespace NetCoreWinConsoleWAM
             try
             {
                 using (var core = new Core())
-                using (var authParams = GetCommonAuthParameters(false))
+                using (var authParams = GetCommonAuthParameters(false, false))
                 {
                     IntPtr hWnd = GetForegroundWindow();
                     
@@ -62,11 +62,11 @@ namespace NetCoreWinConsoleWAM
         }
 
         public static AuthParameters GetCommonAuthParameters(
-            bool isMsaPassthrough)
+            bool isMsaPassthrough, bool isInit)
         {
-            const string clientId = "04f0c124-f2bc-4f59-8241-bf6df9866bbd";
+            const string clientId = "4b0db8c2-9f26-4417-8bde-3f0e3656f8e0";
             const string authority = "https://login.microsoftonline.com/organizations";
-            const string scopes = "https://management.core.windows.net//.default";
+            const string scopes = "user.read";
             const string redirectUri = "http://localhost";
 
             //MSA-PT Auth Params
@@ -86,9 +86,11 @@ namespace NetCoreWinConsoleWAM
             if (isMsaPassthrough)
                 authParams.Properties[nativeInteropMsalRequestType] = consumersPassthroughRequest;
 
-            //uncomment to test username password flow
-            authParams.Properties["MSALRuntime_Username"] = "email";
-            authParams.Properties["MSALRuntime_Password"] = "MyPassword@123";
+            //if (isInit)
+            //{
+                authParams.Properties["MSALRuntime_Username"] = "idlab@msidlab4.onmicrosoft.com";
+                authParams.Properties["MSALRuntime_Password"] = "";
+            //}
 
             return authParams;
         }
@@ -117,7 +119,7 @@ namespace NetCoreWinConsoleWAM
             Console.WriteLine("---------------------------------------------------------------");
 
             using (var core = new Core())
-            using (var authParams = GetCommonAuthParameters(false))
+            using (var authParams = GetCommonAuthParameters(false, false))
             {
                 using (Account acc = await core.ReadAccountByIdAsync(accountId, CorrelationId))
                 {
@@ -140,9 +142,9 @@ namespace NetCoreWinConsoleWAM
             Console.WriteLine("AcquireTokenInteractivelyAsync api.");
 
             using (var core = new Core())
-            using (var authParams = GetCommonAuthParameters(false))
+            using (var authParams = GetCommonAuthParameters(false, false))
             {
-                using (AuthResult result = await core.AcquireTokenInteractivelyAsync(GetConsoleWindow(), authParams, CorrelationId, account))
+                using (AuthResult result = await core.AcquireTokenInteractivelyAsync(GetForegroundWindow(), authParams, CorrelationId, account))
                 {
                     PrintResults(result);
 
@@ -164,7 +166,7 @@ namespace NetCoreWinConsoleWAM
             Console.WriteLine("AcquireTokenSilentlyAsync api.");
 
             using (var core = new Core())
-            using (var authParams = GetCommonAuthParameters(false))
+            using (var authParams = GetCommonAuthParameters(false, false))
             {
                 using (AuthResult result = await core.AcquireTokenSilentlyAsync(authParams, CorrelationId, account))
                 {
@@ -183,27 +185,35 @@ namespace NetCoreWinConsoleWAM
             }
         }
 
-        public static async Task<AuthResult> ValidateAcquireTokenSilentlyWithUserNamePasswordAsync(Account account)
+        public static async Task<AuthResult> ValidateSignInSilentlyAsync()
         {
-            Console.WriteLine("AcquireTokenSilentlyAsync api.");
+            AuthResult result = null;
 
-            using (var core = new Core())
-            using (var authParams = GetCommonAuthParameters(false))
+            Console.WriteLine("SignInSilentlyAsync api.");
+            try
             {
-                using (AuthResult result = await core.AcquireTokenSilentlyAsync(authParams, CorrelationId, account))
+                using (var core = new Core())
+                using (var authParams = GetCommonAuthParameters(false, true))
                 {
-                    PrintResults(result);
+                    using (result = await core.SignInSilentlyAsync(authParams, CorrelationId))
+                    {
+                        PrintResults(result);
 
-                    if (result.IsSuccess)
-                    {
-                        return result;
-                    }
-                    else
-                    {
-                        Console.WriteLine($"Error: {result.Error}");
-                        throw new MsalRuntimeException(result.Error);
+                        if (result.IsSuccess)
+                        {
+                            return result;
+                        }
+                        else
+                        {
+                            Console.WriteLine($"Error: {result.Error}");
+                            throw new MsalRuntimeException(result.Error);
+                        }
                     }
                 }
+            }
+            catch(MsalRuntimeException ex)
+            {
+                throw new MsalRuntimeException(result.Error);
             }
         }
     }

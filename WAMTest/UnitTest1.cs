@@ -6,20 +6,40 @@ using System.Threading.Tasks;
 namespace WAMTest
 {
     [TestClass]
-    public class UnitTest1
+    public class WAMTest
     {
+        AuthResult authResult { get; set; }
+
+        [TestInitialize]
+        public async Task Init()
+        {
+            authResult = await WAMApp.WAMValidate();
+            Assert.IsNotNull(authResult.Account.Id);
+        }
+
+        [TestMethod]
+        public async Task ValidateAcquireTokenSilentlyWithUserNamePasswordAsync()
+        {
+            AuthResult result = await WAMApp.ValidateSignInSilentlyAsync();
+
+            Assert.IsNotNull(result.Account);
+        }
+
+        [TestMethod]
+        public async Task ValidateAcquireTokenInteractivelyAsync()
+        {
+            AuthResult result = await WAMApp.ValidateAcquireTokenInteractivelyAsync(authResult.Account).ConfigureAwait(false);
+
+            Assert.IsNotNull(result.Account);
+        }
+
         [TestMethod]
         public async Task ValidateAcquireTokenSilentlyAsync()
         {
-            AuthResult authResult = await WAMApp.WAMValidate();
-
-            Assert.IsNotNull(authResult.Account.Id);
-
             AuthResult result = await WAMApp.ValidateAcquireTokenSilentlyAsync(authResult.Account);
 
-            Assert.IsNotNull( result.Account);
+            Assert.IsNotNull(result.Account);
         }
 
-        
     }
 }
