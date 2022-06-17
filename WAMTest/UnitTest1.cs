@@ -8,13 +8,14 @@ namespace WAMTest
     [TestClass]
     public class WAMTest
     {
+        AuthResult AuthResult = null;
 
-        //[TestInitialize]
-        //public async Task Init()
-        //{
-        //    AuthResult = await WAMApp.WAMValidate();
-        //    Assert.IsNotNull(AuthResult.Account.Id);
-        //}
+        [TestInitialize]
+        public async Task Init()
+        {
+            AuthResult = await WAMApp.WAMValidate().ConfigureAwait(false);
+            Assert.IsNotNull(AuthResult.Account.Id);
+        }
 
         [TestMethod]
         public async Task ValidateAcquireTokenSilentlyWithUserNamePasswordAsync()
@@ -23,21 +24,21 @@ namespace WAMTest
             Assert.IsNotNull(result);
         }
 
-        //[TestMethod]
-        //public async Task ValidateAcquireTokenInteractivelyAsync()
-        //{
-        //    AuthResult result = await WAMApp.ValidateAcquireTokenInteractivelyAsync(AuthResult.Account).ConfigureAwait(false);
+        [TestMethod]
+        public async Task ValidateAcquireTokenInteractivelyAsync()
+        {
+            AuthResult result = await WAMApp.ValidateAcquireTokenInteractivelyAsync(AuthResult.Account).ConfigureAwait(false);
 
-        //    Assert.IsNotNull(result.Account);
-        //}
+            Assert.IsNotNull(result.Account);
+        }
 
-        //[TestMethod]
-        //public async Task ValidateAcquireTokenSilentlyAsync()
-        //{
-        //    AuthResult result = await WAMApp.ValidateAcquireTokenSilentlyAsync(AuthResult.Account);
+        [TestMethod]
+        public async Task ValidateAcquireTokenSilentlyAsync()
+        {
+            AuthResult result = await WAMApp.ValidateAcquireTokenSilentlyAsync(AuthResult.Account).ConfigureAwait(false);
 
-        //    Assert.IsNotNull(result.Account);
-        //}
+            Assert.IsNotNull(result.Account);
+        }
 
     }
 }

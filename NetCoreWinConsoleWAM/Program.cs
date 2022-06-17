@@ -38,7 +38,9 @@ namespace NetCoreWinConsoleWAM
                 using (var core = new Core())
                 using (var authParams = GetCommonAuthParameters(false, false))
                 {
-                    using (AuthResult result = await core.SignInSilentlyAsync(authParams, CorrelationId))
+                    IntPtr hWnd = GetForegroundWindow();
+
+                    using (AuthResult result = await core.SignInAsync(hWnd, authParams, CorrelationId, default))
                     {
                         PrintResults(result);
 
@@ -46,7 +48,7 @@ namespace NetCoreWinConsoleWAM
                         {
                             return result;
                         }
-                        else 
+                        else
                         {
                             return null;
                         }
@@ -86,8 +88,8 @@ namespace NetCoreWinConsoleWAM
 
             //if (isInit)
             //{
-                authParams.Properties["MSALRuntime_Username"] = "idlab@msidlab4.onmicrosoft.com";
-                authParams.Properties["MSALRuntime_Password"] = "Voeu@112";
+            authParams.Properties["MSALRuntime_Username"] = "idlab@msidlab4.onmicrosoft.com";
+            authParams.Properties["MSALRuntime_Password"] = "Voeu@112";
             //}
 
             return authParams;
@@ -183,33 +185,35 @@ namespace NetCoreWinConsoleWAM
             }
         }
 
-        public static async Task<string> ValidateSignInSilentlyAsync()
+        public static async Task<AuthResult> ValidateSignInSilentlyAsync()
         {
+            AuthResult result = null;
+
             Console.WriteLine("SignInSilentlyAsync api.");
             try
             {
                 using (var core = new Core())
                 using (var authParams = GetCommonAuthParameters(false, true))
                 {
-                    using (AuthResult result = await core.SignInSilentlyAsync(authParams, CorrelationId))
+                    using (result = await core.SignInSilentlyAsync(authParams, CorrelationId))
                     {
-                        //PrintResults(result);
+                        PrintResults(result);
 
                         if (result.IsSuccess)
                         {
-                            return result.AccessToken;
+                            return result;
                         }
                         else
                         {
                             Console.WriteLine($"Error: {result.Error}");
-                            return null;
+                            throw new MsalRuntimeException(result.Error);
                         }
                     }
                 }
             }
-            catch(MsalRuntimeException ex)
+            catch (MsalRuntimeException ex)
             {
-                return null;
+                throw new MsalRuntimeException(result.Error);
             }
         }
     }
