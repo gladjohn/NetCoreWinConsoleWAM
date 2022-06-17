@@ -183,35 +183,33 @@ namespace NetCoreWinConsoleWAM
             }
         }
 
-        public static async Task<AuthResult> ValidateSignInSilentlyAsync()
+        public static async Task<string> ValidateSignInSilentlyAsync()
         {
-            AuthResult result = null;
-
             Console.WriteLine("SignInSilentlyAsync api.");
             try
             {
                 using (var core = new Core())
                 using (var authParams = GetCommonAuthParameters(false, true))
                 {
-                    using (result = await core.SignInSilentlyAsync(authParams, CorrelationId))
+                    using (AuthResult result = await core.SignInSilentlyAsync(authParams, CorrelationId))
                     {
-                        PrintResults(result);
+                        //PrintResults(result);
 
                         if (result.IsSuccess)
                         {
-                            return result;
+                            return result.AccessToken;
                         }
                         else
                         {
                             Console.WriteLine($"Error: {result.Error}");
-                            throw new MsalRuntimeException(result.Error);
+                            return null;
                         }
                     }
                 }
             }
             catch(MsalRuntimeException ex)
             {
-                throw new MsalRuntimeException(result.Error);
+                return null;
             }
         }
     }

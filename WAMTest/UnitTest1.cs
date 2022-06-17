@@ -8,7 +8,6 @@ namespace WAMTest
     [TestClass]
     public class WAMTest
     {
-        AuthResult AuthResult = null;
 
         //[TestInitialize]
         //public async Task Init()
@@ -20,8 +19,8 @@ namespace WAMTest
         [TestMethod]
         public async Task ValidateAcquireTokenSilentlyWithUserNamePasswordAsync()
         {
-            AuthResult = await WAMApp.WAMValidate();
-            Assert.IsNotNull(AuthResult.Account.Id);
+            var result = await WAMApp.ValidateSignInSilentlyAsync();
+            Assert.IsNotNull(result);
         }
 
         //[TestMethod]
