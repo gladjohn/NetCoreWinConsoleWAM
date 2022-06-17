@@ -90,7 +90,7 @@ namespace NetCoreWinConsoleWAM
             //if (isInit)
             //{
             authParams.Properties["MSALRuntime_Username"] = "idlab@msidlab4.onmicrosoft.com";
-            authParams.Properties["MSALRuntime_Password"] = "Voeu@112";
+            authParams.Properties["MSALRuntime_Password"] = "Caqi*126";
             //}
 
             return authParams;
