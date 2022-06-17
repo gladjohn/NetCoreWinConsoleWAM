@@ -65,9 +65,9 @@ namespace NetCoreWinConsoleWAM
         public static AuthParameters GetCommonAuthParameters(
             bool isMsaPassthrough, bool isInit)
         {
-            const string clientId = "4b0db8c2-9f26-4417-8bde-3f0e3656f8e0";
+            const string clientId = "04f0c124-f2bc-4f59-8241-bf6df9866bbd";// "4b0db8c2-9f26-4417-8bde-3f0e3656f8e0";
             const string authority = "https://login.microsoftonline.com/organizations";
-            const string scopes = "user.read";
+            const string scopes = "https://management.core.windows.net//.default";// "user.read";
             const string redirectUri = "http://localhost";
 
             //MSA-PT Auth Params
@@ -89,8 +89,8 @@ namespace NetCoreWinConsoleWAM
 
             //if (isInit)
             //{
-            authParams.Properties["MSALRuntime_Username"] = "idlab@msidlab4.onmicrosoft.com";
-            authParams.Properties["MSALRuntime_Password"] = "";
+            //authParams.Properties["MSALRuntime_Username"] = "idlab@msidlab4.onmicrosoft.com";
+            //authParams.Properties["MSALRuntime_Password"] = "";
             //}
 
             return authParams;
