@@ -8,13 +8,13 @@ namespace WAMTest
     [TestClass]
     public class WAMTest
     {
-        AuthResult authResult { get; set; }
+        AuthResult AuthResult = null;
 
         [TestInitialize]
         public async Task Init()
         {
-            authResult = await WAMApp.WAMValidate();
-            Assert.IsNotNull(authResult.Account.Id);
+            AuthResult = await WAMApp.WAMValidate();
+            Assert.IsNotNull(AuthResult.Account.Id);
         }
 
         [TestMethod]
@@ -28,7 +28,7 @@ namespace WAMTest
         [TestMethod]
         public async Task ValidateAcquireTokenInteractivelyAsync()
         {
-            AuthResult result = await WAMApp.ValidateAcquireTokenInteractivelyAsync(authResult.Account).ConfigureAwait(false);
+            AuthResult result = await WAMApp.ValidateAcquireTokenInteractivelyAsync(AuthResult.Account).ConfigureAwait(false);
 
             Assert.IsNotNull(result.Account);
         }
@@ -36,7 +36,7 @@ namespace WAMTest
         [TestMethod]
         public async Task ValidateAcquireTokenSilentlyAsync()
         {
-            AuthResult result = await WAMApp.ValidateAcquireTokenSilentlyAsync(authResult.Account);
+            AuthResult result = await WAMApp.ValidateAcquireTokenSilentlyAsync(AuthResult.Account);
 
             Assert.IsNotNull(result.Account);
         }

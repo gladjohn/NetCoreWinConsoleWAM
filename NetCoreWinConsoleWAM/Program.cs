@@ -38,9 +38,7 @@ namespace NetCoreWinConsoleWAM
                 using (var core = new Core())
                 using (var authParams = GetCommonAuthParameters(false, false))
                 {
-                    IntPtr hWnd = GetForegroundWindow();
-                    
-                    using (AuthResult result = await core.SignInAsync(hWnd, authParams, CorrelationId, default))
+                    using (AuthResult result = await core.SignInSilentlyAsync(authParams, CorrelationId))
                     {
                         PrintResults(result);
 
