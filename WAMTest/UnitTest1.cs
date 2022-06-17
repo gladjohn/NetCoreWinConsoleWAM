@@ -10,12 +10,12 @@ namespace WAMTest
     {
         AuthResult AuthResult = null;
 
-        [TestInitialize]
-        public async Task Init()
-        {
-            AuthResult = await WAMApp.WAMValidate();
-            Assert.IsNotNull(AuthResult.Account.Id);
-        }
+        //[TestInitialize]
+        //public async Task Init()
+        //{
+        //    AuthResult = await WAMApp.WAMValidate();
+        //    Assert.IsNotNull(AuthResult.Account.Id);
+        //}
 
         [TestMethod]
         public async Task ValidateAcquireTokenSilentlyWithUserNamePasswordAsync()
