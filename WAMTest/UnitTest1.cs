@@ -10,35 +10,29 @@ namespace WAMTest
     {
         AuthResult AuthResult = null;
 
-        //[TestInitialize]
-        //public async Task Init()
-        //{
-        //    AuthResult = await WAMApp.WAMValidate().ConfigureAwait(false);
-        //    //Assert.IsNotNull(AuthResult.Account.Id);
-        //}
-
-        [TestMethod]
-        public async Task ValidateAcquireTokenSilentlyWithUserNamePasswordAsync()
+        [TestInitialize]
+        public async Task Init()
         {
-            var result = await WAMApp.ValidateSignInSilentlyAsync();
-            Assert.IsNotNull(result);
+            AuthResult = await WAMApp.WAMValidate().ConfigureAwait(false);
+            Assert.IsNotNull(AuthResult.Account.Id);
         }
 
-        //[TestMethod]
-        //public async Task ValidateAcquireTokenInteractivelyAsync()
-        //{
-        //    AuthResult result = await WAMApp.ValidateAcquireTokenInteractivelyAsync(AuthResult.Account).ConfigureAwait(false);
 
-        //    Assert.IsNotNull(result.Account);
-        //}
+        [TestMethod]
+        public async Task ValidateAcquireTokenInteractivelyAsync()
+        {
+            AuthResult result = await WAMApp.ValidateAcquireTokenInteractivelyAsync(AuthResult.Account).ConfigureAwait(false);
 
-        //[TestMethod]
-        //public async Task ValidateAcquireTokenSilentlyAsync()
-        //{
-        //    AuthResult result = await WAMApp.ValidateAcquireTokenSilentlyAsync(AuthResult.Account).ConfigureAwait(false);
+            Assert.IsNotNull(result.Account);
+        }
 
-        //    Assert.IsNotNull(result.Account);
-        //}
+        [TestMethod]
+        public async Task ValidateAcquireTokenSilentlyAsync()
+        {
+            AuthResult result = await WAMApp.ValidateAcquireTokenSilentlyAsync(AuthResult.Account).ConfigureAwait(false);
+
+            Assert.IsNotNull(result.Account);
+        }
 
     }
 }

@@ -18,11 +18,11 @@ namespace NetCoreWinConsoleWAM
 
         static async Task Main(string[] args)
         {
-            //AuthResult wamValidate = await WAMValidate().ConfigureAwait(false);
-            await ValidateSignInSilentlyAsync().ConfigureAwait(false);
-            //await ValidateAcquireTokenSilentlyAsync(wamValidate.Account).ConfigureAwait(false);
-            //await ValidateAcquireTokenInteractivelyAsync(wamValidate.Account).ConfigureAwait(false);
-            //await ValidateReadAccountByIdAsync(wamValidate.Account.Id).ConfigureAwait(false);
+            AuthResult wamValidate = await WAMValidate().ConfigureAwait(false);
+            //await ValidateSignInSilentlyAsync().ConfigureAwait(false);
+            await ValidateAcquireTokenSilentlyAsync(wamValidate.Account).ConfigureAwait(false);
+            await ValidateAcquireTokenInteractivelyAsync(wamValidate.Account).ConfigureAwait(false);
+            await ValidateReadAccountByIdAsync(wamValidate.Account.Id).ConfigureAwait(false);
 
             Console.ReadLine();
 
@@ -36,7 +36,7 @@ namespace NetCoreWinConsoleWAM
             try
             {
                 using (var core = new Core())
-                using (var authParams = GetCommonAuthParameters(false, false))
+                using (var authParams = GetCommonAuthParameters(false))
                 {
                     IntPtr hWnd = GetForegroundWindow();
 
@@ -63,7 +63,7 @@ namespace NetCoreWinConsoleWAM
         }
 
         public static AuthParameters GetCommonAuthParameters(
-            bool isMsaPassthrough, bool isInit)
+            bool isMsaPassthrough)
         {
             const string clientId = "04f0c124-f2bc-4f59-8241-bf6df9866bbd";// "4b0db8c2-9f26-4417-8bde-3f0e3656f8e0";
             const string authority = "https://login.microsoftonline.com/organizations";
@@ -86,12 +86,6 @@ namespace NetCoreWinConsoleWAM
             //MSA-PT
             if (isMsaPassthrough)
                 authParams.Properties[nativeInteropMsalRequestType] = consumersPassthroughRequest;
-
-            //if (isInit)
-            //{
-            //authParams.Properties["MSALRuntime_Username"] = "idlab@msidlab4.onmicrosoft.com";
-            //authParams.Properties["MSALRuntime_Password"] = "";
-            //}
 
             return authParams;
         }
@@ -120,7 +114,7 @@ namespace NetCoreWinConsoleWAM
             Console.WriteLine("---------------------------------------------------------------");
 
             using (var core = new Core())
-            using (var authParams = GetCommonAuthParameters(false, false))
+            using (var authParams = GetCommonAuthParameters(false))
             {
                 using (Account acc = await core.ReadAccountByIdAsync(accountId, CorrelationId))
                 {
@@ -143,7 +137,7 @@ namespace NetCoreWinConsoleWAM
             Console.WriteLine("AcquireTokenInteractivelyAsync api.");
 
             using (var core = new Core())
-            using (var authParams = GetCommonAuthParameters(false, false))
+            using (var authParams = GetCommonAuthParameters(false))
             {
                 using (AuthResult result = await core.AcquireTokenInteractivelyAsync(GetForegroundWindow(), authParams, CorrelationId, account))
                 {
@@ -167,7 +161,7 @@ namespace NetCoreWinConsoleWAM
             Console.WriteLine("AcquireTokenSilentlyAsync api.");
 
             using (var core = new Core())
-            using (var authParams = GetCommonAuthParameters(false, false))
+            using (var authParams = GetCommonAuthParameters(false))
             {
                 using (AuthResult result = await core.AcquireTokenSilentlyAsync(authParams, CorrelationId, account))
                 {
@@ -186,6 +180,10 @@ namespace NetCoreWinConsoleWAM
             }
         }
 
+        /// <summary>
+        /// For User Name Password Flow
+        /// </summary>
+        /// <returns></returns>
         public static async Task<AuthResult> ValidateSignInSilentlyAsync()
         {
             AuthResult result = null;
@@ -194,7 +192,7 @@ namespace NetCoreWinConsoleWAM
             try
             {
                 using (var core = new Core())
-                using (var authParams = GetCommonAuthParameters(false, true))
+                using (var authParams = GetCommonAuthParameters(false))
                 {
                     using (result = await core.SignInSilentlyAsync(authParams, CorrelationId))
                     {
